@@ -1,0 +1,84 @@
+
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+int sum = 0;
+int u = 0;
+int i = 0;
+int j = 1;
+int turn;
+bool flag[2];
+
+void *runner(void *param);
+
+void *runner(void *param)
+{
+        clock_t start = clock();
+
+        flag[i] = true;
+        turn = j;
+        while(flag[j] && turn == j)
+                ;
+        int u, upper = atoi(param);
+
+        for(u = 1; u <= upper; u++)
+        {
+                sum += 1;
+        }
+
+        flag[i] = false;
+        clock_t end = clock();
+        printf("\nt1's running time : %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+
+        pthread_exit(0);
+
+}
+
+void *runner2(void *param)
+{
+        clock_t start = clock();
+
+        flag[j] = true;
+        turn = i;
+        while(flag[i] && turn == i)
+                ;
+        int u, upper = atoi(param);
+
+        for(u = 1; u <= upper; u++)
+        {
+                sum -= 1;
+        }
+
+        flag[j] = false;
+        clock_t end = clock();
+        printf("\nt2's running time : %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+        pthread_exit(0);
+}
+
+int main(int argc, int *argv[])
+{
+        clock_t start = clock();
+
+        int user = argc;
+        pthread_attr_t attr;
+        pthread_t workers[user];
+
+        pthread_attr_init(&attr);
+
+        pthread_create(&workers[1], &attr, runner, argv[1]);
+        pthread_create(&workers[2], &attr, runner2, argv[1]);
+
+        for(int i=1; i<user; i++)
+        {
+                pthread_join(workers[i],NULL);
+        }
+
+ 	clock_t end = clock();
+        printf("\nall running time : %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+        printf("sum = %d\n", sum);
+
+}
+                   
